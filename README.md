@@ -70,3 +70,8 @@ run,element,enthalpy,temp_c,temp_k,exp_x,cal_x
 `temp_k` is the temperature in Kelvin, (if not know, set -1).  
 `exp_x` is the experimental molar fraction at en eutectic, (if not know, set -1).  
 `cal_c` is the calculate molar fraction at en eutectic, (if not know, set -1).
+
+
+## License
+
+This code is under no license and thus not free to use.
