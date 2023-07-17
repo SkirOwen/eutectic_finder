@@ -1,7 +1,6 @@
 import argparse
 from argparse import Namespace
 from rich.prompt import Prompt
-import numpy as np
 
 from eutectic import run_from_csv, run_eutectic
 
@@ -74,7 +73,7 @@ def main() -> None:
 			Hi = args.enthalpy
 			Ti = args.temperature
 		if args.celsius:
-			Ti = np.array(Ti) + 273.15
+			Ti = [t + 273.15 for t in Ti]
 		run_eutectic(Hi, Ti, args.celsius)
 
 
