@@ -65,9 +65,9 @@ run,element,enthalpy,temp_c,temp_k,exp_x,cal_x
 
 `run` specify the numbers of element in a mixture.  
 `element` is the symbol of the element present.  
-`enthalpy` is the fusion enthalpy in J/mol.  
-`temp_c` is the temperature in Celsius, (if not know, set -1).   
-`temp_k` is the temperature in Kelvin, (if not know, set -1).  
+`enthalpy` is the melting enthalpy in J/mol.  
+`temp_c` is the melting temperature in Celsius, (if not know, set -1).   
+`temp_k` is the melting temperature in Kelvin, (if not know, set -1).  
 `exp_x` is the experimental molar fraction at en eutectic, (if not know, set -1).  
 `cal_c` is the calculate molar fraction at en eutectic, (if not know, set -1).
 
