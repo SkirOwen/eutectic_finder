@@ -9,6 +9,7 @@ from utils import get_lines_for_run
 
 
 def equations(variables, Hi, Ti) -> list:
+	"""Setting up the equations to solve."""
 	# xi, T = variables
 	xi = variables[:-1]
 	T = variables[-1]
@@ -25,7 +26,43 @@ def equations(variables, Hi, Ti) -> list:
 	return equations
 
 
-def find_eutectic(Hi, Ti) -> tuple:
+def equations_fix(variables, Hi, Ti, xf: np.ndarray) -> list:
+	# xi, T = variables
+	xi = variables[:-1]
+	T = variables[-1]
+	sum_xf = np.sum(xf)
+
+	# Constants
+	R = 8.314510  # Gas constant
+
+	# Equations
+	equations = [
+		np.log(xi[i]) + Hi[i] / (R * T) - Hi[i] / (R * Ti[i]) for i in range(len(xi))
+	]
+	equations.append(np.sum(xi) - sum_xf)
+
+	return equations
+
+
+def find_eutectic(Hi: np.ndarray, Ti: np.ndarray) -> tuple:
+	"""Function to set up the initial guesses and run the solver to find the eutectic.
+
+	Parameters
+	----------
+	Hi : array-like
+		Array like of the enthalpy of each element, in J/mol.
+	Ti : array-like
+		Array like of the melting temperature of each element.
+
+	Returns
+	-------
+	tuple
+		the solution given by scipy.fsolve
+
+	See Also
+	--------
+	scipy.fsolve
+	"""
 	initial_guess = np.ones(len(Hi) + 1) / (len(Hi) + 1)
 	initial_guess[-1] = Ti[0]
 
@@ -34,8 +71,19 @@ def find_eutectic(Hi, Ti) -> tuple:
 	return solution
 
 
-def run_eutectic(Hi, Ti, use_celsius) -> None:
-	"""Wrapper for printing information"""
+def run_eutectic(Hi: np.ndarray, Ti: np.ndarray, use_celsius: bool) -> None:
+	"""Wrapper for running the solver and printing information.
+
+	Parameters
+	----------
+	Hi : array-like
+		Array like of the enthalpy of each element, in J/mol.
+	Ti : array-like
+		Array like of the melting temperature of each element.
+	use_celsius : bool
+		If True the temperature is assumed to be in Celsius.
+		Otherwise, using Kelvin.
+	"""
 
 	temp_unit = "C" if use_celsius else "K"
 	print(Panel.fit(
@@ -65,7 +113,25 @@ def run_eutectic(Hi, Ti, use_celsius) -> None:
 	console.print(table)
 
 
-def run_from_csv(filename: str, run: int, use_celsius: bool):
+def run_from_csv(filename: str, run: int, use_celsius: bool) -> None:
+	"""Function to run the solver from a csv.
+
+	Parameters
+	----------
+	filename : str
+		The filename of the csv to use, support path.
+	run : int
+		Run number to pick from the csv.
+	use_celsius : bool
+		If True the temperature is assumed to be in Celsius.
+		Otherwise, using Kelvin.
+
+	Raises
+	------
+	ValueError
+		If the temperature chosen with `use_celsius` does not exist in the csv,
+		i.e. has a value of -300
+	"""
 	run_info, mixture = get_lines_for_run(filename, run_number=run)
 	print(f"Using Run #{run}")
 
@@ -74,12 +140,12 @@ def run_from_csv(filename: str, run: int, use_celsius: bool):
 	Hi = mixture[:, 0]
 	if use_celsius:
 		Ti = mixture[:, 1]
-		if (Ti == -1).any():
+		if (Ti == -300).any():
 			raise ValueError("Celsius temperature not defined")
 		Ti += 273.15
 	else:
 		Ti = mixture[:, 2]
-		if (Ti == -1).any():
+		if (Ti == -300).any():
 			raise ValueError("Kelvin temperature not defined")
 	run_eutectic(Hi, Ti, use_celsius)
 
