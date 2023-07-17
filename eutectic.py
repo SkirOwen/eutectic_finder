@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 from scipy.optimize import fsolve
 from rich import print
@@ -26,11 +28,14 @@ def equations(variables, Hi, Ti) -> list:
 	return equations
 
 
-def equations_fix(variables, Hi, Ti, xf: np.ndarray) -> list:
+def equations_fix_value(variables, Hi, Ti, xf: None | np.ndarray = None) -> list:
 	# xi, T = variables
 	xi = variables[:-1]
 	T = variables[-1]
-	sum_xf = np.sum(xf)
+	# TODO: Hi, Ti, (and xi) needs to be len(xf) smaller.
+	# TODO: Need to remove the element.s fixed by xf.
+
+	sum_xf = 0 if xf is None else np.sum(xf)
 
 	# Constants
 	R = 8.314510  # Gas constant
@@ -39,7 +44,7 @@ def equations_fix(variables, Hi, Ti, xf: np.ndarray) -> list:
 	equations = [
 		np.log(xi[i]) + Hi[i] / (R * T) - Hi[i] / (R * Ti[i]) for i in range(len(xi))
 	]
-	equations.append(np.sum(xi) - sum_xf)
+	equations.append(np.sum(xi) + sum_xf - 1)
 
 	return equations
 
@@ -71,7 +76,7 @@ def find_eutectic(Hi: np.ndarray, Ti: np.ndarray) -> tuple:
 	return solution
 
 
-def run_eutectic(Hi: np.ndarray, Ti: np.ndarray, use_celsius: bool) -> None:
+def run_eutectic(Hi: np.ndarray, Ti: np.ndarray, use_celsius: bool, xf: None | list = None) -> None:
 	"""Wrapper for running the solver and printing information.
 
 	Parameters
@@ -93,7 +98,10 @@ def run_eutectic(Hi: np.ndarray, Ti: np.ndarray, use_celsius: bool) -> None:
 	))
 	print(f"Using Kelvin: {not use_celsius}\n")
 
-	solution = find_eutectic(Hi, Ti)
+	if xf is None:
+		solution = find_eutectic(Hi, Ti)
+	else:
+		solution = find_eutectic(Hi, Ti)
 	xi = solution[:-1]
 	T = solution[-1]
 
