@@ -74,4 +74,4 @@ run,element,enthalpy,temp_c,temp_k,exp_x,cal_x
 
 ## License
 
-This code is under no license and thus not free to use.
+This code is under Apache 2.0
